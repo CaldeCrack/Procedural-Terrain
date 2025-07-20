@@ -4,15 +4,45 @@
 [ext_resource type="PackedScene" uid="uid://b158qd8ka0m4d" path="res://Scenes/Player.tscn" id="2_jpm5l"]
 
 [sub_resource type="Environment" id="Environment_b5aj7"]
+background_mode = 1
+ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.4
+ssr_max_steps = 48
+ssr_fade_in = 11.819
+ssr_fade_out = 2.14355
+ssr_depth_tolerance = 93.51
+ssao_radius = 4.95
+ssao_intensity = 8.13
+ssao_power = 6.0
+ssao_horizon = 0.46
+ssao_sharpness = 0.43
+ssao_light_affect = 0.51
+ssao_ao_channel_affect = 0.73
+ssil_intensity = 16.0
+glow_normalized = true
+glow_intensity = 2.17
+glow_bloom = 1.0
+glow_map_strength = 0.0
+fog_mode = 1
+fog_light_energy = 0.0
+fog_density = 1.0
+fog_depth_end = 60.0
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.1192
+volumetric_fog_albedo = Color(0.0431373, 0.0980392, 0.00784314, 1)
+volumetric_fog_emission = Color(0.0416154, 0.0979174, 0.00810103, 1)
+volumetric_fog_emission_energy = 0.35
+volumetric_fog_length = 130.0
+volumetric_fog_temporal_reprojection_amount = 0.7
+adjustment_enabled = true
+adjustment_contrast = 1.05
+adjustment_saturation = 1.35
 
 [node name="Node3D" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_b5aj7")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.412049, 0.817437, 0.402509, -0.833984, 0.160424, 0.527953, 0.366996, -0.553228, 0.747832, 0.151963, 0, 0)
 
 [node name="Player" parent="." instance=ExtResource("2_jpm5l")]
 

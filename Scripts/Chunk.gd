@@ -2,14 +2,14 @@ extends MeshInstance3D
 
 # --- Settings and Variables ---
 @export var noise_scale : float = 1.0
-@export var iso_level : float = 1.12
+@export var iso_level : float = 0.9
 
 var player : Node3D
 var unload_dist : int
 var chunk_scale : int
 var pos3i : Vector3i
 
-const resolution : int = 6
+const resolution : int = 5
 const work_group_size : int = 8
 const num_voxels_per_axis : int = work_group_size * resolution
 const buffer_set_index : int = 0
@@ -163,7 +163,7 @@ func create_mesh() -> void:
 	if verts.is_empty():
 		return
 
-	var mesh_data := []
+	var mesh_data : Array = []
 	mesh_data.resize(Mesh.ARRAY_MAX)
 	mesh_data[Mesh.ARRAY_VERTEX] = verts
 	mesh_data[Mesh.ARRAY_NORMAL] = normals
@@ -196,16 +196,12 @@ func load_lut(file_path : String) -> Array[int]:
 
 func _notification(type: int) -> void:
 	if type == NOTIFICATION_PREDELETE:
-		pass
-		# release()
+		release()
 
 func release() -> void:
-	# rd.free_rid(pipeline)
 	rd.free_rid(triangle_buffer)
 	rd.free_rid(params_buffer)
 	rd.free_rid(counter_buffer);
-	# rd.free_rid(lut_buffer);
-	# rd.free_rid(shader)
 
 	pipeline = RID()
 	triangle_buffer = RID()
@@ -214,5 +210,4 @@ func release() -> void:
 	lut_buffer = RID()
 	shader = RID()
 
-	rd.free()
 	rd = null

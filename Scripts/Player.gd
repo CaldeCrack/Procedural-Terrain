@@ -1,58 +1,85 @@
 extends Node3D
 
 @export var move_speed := 20.0
-@export var mouse_sensitivity := 0.002
+@export var rotation_speed := 1.5
+@export var gravity := 20.0
+@export var upward_acceleration := 50.0
+@export var max_upward_speed := 15.0
 
 @onready var camera = $Camera3D
+@onready var drone = $drone
 
-var velocity := Vector3.ZERO
-var input_direction := Vector3.ZERO
-var rotation_y := 0.0  # Yaw
-var rotation_x := 0.0  # Pitch
+var vertical_velocity := 0.0
+var yaw := 0.0
+var pitch := 0.0
+var pitch_limit := 0.6
+var roll := 0.0
+var roll_limit := 0.4
+var roll_speed := 3.0
 
-func _ready():
+const drone_rot_offset := 90
+
+func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
-func _unhandled_input(event):
-	if event is InputEventMouseMotion:
-		# Rotate player horizontally
-		rotation_y -= event.relative.x * mouse_sensitivity
+func _process(delta: float) -> void:
+	if Input.is_action_just_pressed("toggle_mouse"):
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE \
+			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED else Input.MOUSE_MODE_CAPTURED)
 
-		# Rotate camera vertically
-		rotation_x -= event.relative.y * mouse_sensitivity
-		rotation_x = clamp(rotation_x, deg_to_rad(-89), deg_to_rad(89))
-		rotation.y = rotation_y
-		camera.rotation.x = rotation_x
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		_handle_input(delta)
+		_update_camera()
 
-func _process(delta):
-	_handle_input()
-	_move(delta)
-
-func _handle_input():
-	input_direction = Vector3.ZERO
-	if Input.is_action_pressed("move_forward"):
-		input_direction += Vector3.FORWARD
-	if Input.is_action_pressed("move_backward"):
-		input_direction -= Vector3.FORWARD
+func _handle_input(delta):
+	# --- Handle Rotation ---
 	if Input.is_action_pressed("move_left"):
-		input_direction -= Vector3.RIGHT
+		yaw += rotation_speed * delta
 	if Input.is_action_pressed("move_right"):
-		input_direction += Vector3.RIGHT
+		yaw -= rotation_speed * delta
+
+	if Input.is_action_pressed("move_forward"):
+		pitch = lerp(pitch, -pitch_limit, 2 * delta)
+	elif Input.is_action_pressed("move_backward"):
+		pitch = lerp(pitch, pitch_limit, 2 * delta)
+	else:
+		pitch = lerp(pitch, 0.0, delta)
+
+	if Input.is_action_pressed("move_left"):
+		roll = lerp(roll, -roll_limit, roll_speed * delta)
+	elif Input.is_action_pressed("move_right"):
+		roll = lerp(roll, roll_limit, roll_speed * delta)
+	else:
+		roll = lerp(roll, 0.0, roll_speed * delta)
+
+	rotation.y = yaw
+	drone.rotation = Vector3(roll, deg_to_rad(drone_rot_offset), pitch)
+
+	# --- Movement ---
+	var movement := Vector3.ZERO
+
+	# Forward/backward only if pressing W/S
+	var forward_dir = -transform.basis.z
+	forward_dir.y = 0
+	forward_dir = forward_dir.normalized()
+	if Input.is_action_pressed("move_forward"):
+		movement += forward_dir * move_speed
+	elif Input.is_action_pressed("move_backward"):
+		movement -= forward_dir * move_speed
+
+	# Ascend (thrust up)
 	if Input.is_action_pressed("move_up"):
-		input_direction += Vector3.UP
-	if Input.is_action_pressed("move_down"):
-		input_direction -= Vector3.UP
-	if Input.is_action_just_pressed("accelerate"):
-		move_speed *= 3
-	elif Input.is_action_just_released("accelerate"):
-		move_speed /= 3
+		vertical_velocity += upward_acceleration * delta
+	else:
+		vertical_velocity -= gravity * delta
 
-	input_direction = input_direction.normalized()
+	vertical_velocity = clamp(vertical_velocity, -30.0, max_upward_speed)
+	movement.y = vertical_velocity
 
-func _move(delta):
-	if input_direction == Vector3.ZERO:
-		return
+	# Apply final movement
+	global_translate(movement * delta)
 
-	# Transform input_direction relative to the camera
-	var direction = global_transform.basis * input_direction
-	global_translate(direction * move_speed * delta)
+func _update_camera() -> void:
+	var back_offset := Vector3(0, 2.2, -3.2)
+	camera.global_transform.origin = global_transform.origin - (transform.basis.z * back_offset.z) + (transform.basis.y * back_offset.y)
+	camera.look_at(global_transform.origin + Vector3.UP * 1.7, Vector3.UP)

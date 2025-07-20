@@ -1,9 +1,78 @@
-[gd_scene load_steps=2 format=3 uid="uid://b158qd8ka0m4d"]
+[gd_scene load_steps=9 format=3 uid="uid://b158qd8ka0m4d"]
 
 [ext_resource type="Script" uid="uid://v3xi2lf81tqh" path="res://Scripts/Player.gd" id="1_rpqav"]
+[ext_resource type="AudioStream" uid="uid://6umis7w6wxid" path="res://Sounds/cave_ambiance.mp3" id="2_kyqiw"]
+[ext_resource type="PackedScene" uid="uid://c5svvhdk7e7gk" path="res://Scenes/Drone_Model.tscn" id="3_gntrk"]
+
+[sub_resource type="Gradient" id="Gradient_rpqav"]
+offsets = PackedFloat32Array(0, 0.244444, 0.677778, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_kyqiw"]
+gradient = SubResource("Gradient_rpqav")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_rpqav"]
+lifetime_randomness = 0.1
+particle_flag_rotate_y = true
+emission_shape = 3
+emission_box_extents = Vector3(25, 12, 25)
+angle_min = -720.0
+angle_max = 720.0
+direction = Vector3(0, 0, 0)
+spread = 180.0
+initial_velocity_max = 1.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.5
+color_ramp = SubResource("GradientTexture1D_kyqiw")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rpqav"]
+transparency = 1
+vertex_color_use_as_albedo = true
+albedo_texture_force_srgb = true
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+distance_fade_min_distance = 5.0
+distance_fade_max_distance = 2058.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_kyqiw"]
+material = SubResource("StandardMaterial3D_rpqav")
+size = Vector2(0.07, 0.07)
 
 [node name="Player" type="Node3D"]
 script = ExtResource("1_rpqav")
+move_speed = 12.0
 
 [node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.961262, 0.275637, 0, -0.275637, 0.961262, 0, 0, 0)
 fov = 90.0
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+amount = 6000
+lifetime = 3.0
+preprocess = 1.0
+speed_scale = 0.25
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_rpqav")
+draw_pass_1 = SubResource("PlaneMesh_kyqiw")
+
+[node name="Cave_Ambiance" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_kyqiw")
+volume_db = 5.0
+autoplay = true
+
+[node name="drone" parent="." instance=ExtResource("3_gntrk")]
+transform = Transform3D(-2.62268e-08, 0, 0.6, 0, 0.6, 0, -0.6, 0, -2.62268e-08, 0, 0, 0)
+
+[node name="DroneIlumination" type="OmniLight3D" parent="drone"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -3.085, 0.816667, -1.3485e-07)
+light_cull_mask = 4294966274
+
+[node name="SpotLight3D" type="SpotLight3D" parent="drone"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0.641702, -0.0356528, -1.56617e-08)
+light_energy = 16.0
+light_volumetric_fog_energy = 100.0
+spot_range = 26.1264
+spot_angle = 25.0
+spot_angle_attenuation = 2.73208
