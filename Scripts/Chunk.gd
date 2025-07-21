@@ -1,15 +1,15 @@
 extends MeshInstance3D
 
 # --- Settings and Variables ---
-@export var noise_scale : float = 1.0
-@export var iso_level : float = 0.9
+@export var noise_scale : float = 2.1
+@export var iso_level : float = 1.0
 
 var player : Node3D
 var unload_dist : int
 var chunk_scale : int
 var pos3i : Vector3i
 
-const resolution : int = 5
+const resolution : int = 6
 const work_group_size : int = 8
 const num_voxels_per_axis : int = work_group_size * resolution
 const buffer_set_index : int = 0
