@@ -4,7 +4,7 @@ Terreno procedural generado usando ruido aleatorio (psrdnoise3.glsl) y el algori
 Proyecto principalmente inspirado por Sebastian Lague.
 
 # Demo
-![](gpu.mp4)
+https://github.com/user-attachments/assets/4828153d-fbe5-4ec4-8c67-3e6524009799
 
 # Referencias
 - https://github.com/SebLague/Marching-Cubes
