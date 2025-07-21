@@ -1,7 +1,7 @@
 # Terreno Procedural usando Marching Cubes
 Terreno procedural generado usando ruido aleatorio (psrdnoise3.glsl) y el algoritmo de Marching Cubes mediante compute shaders.
 
-Proyecto principalmente inspirado por Sebastian Lague.
+Proyecto principalmente inspirado por Sebastian Lague y realizado como proyecto final del ramo Computación en GPU.
 
 # Demo
 https://github.com/user-attachments/assets/4828153d-fbe5-4ec4-8c67-3e6524009799
